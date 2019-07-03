@@ -1,0 +1,46 @@
+import numpy as np
+
+#initialize Hash Matrices A and B
+AlphabetSize = 2
+HashLength = 12
+NumberOfSequences = np.power(AlphabetSize,HashLength)
+NumberOfBuckets = HashLength
+A = np.zeros((NumberOfSequences,HashLength))
+B = np.zeros((NumberOfSequences,HashLength))
+
+#initialize Probability matrix
+
+PMatrix = np.zeros((2,2))
+
+p = .01
+epsilon = .005
+PMatrix[0,0] = 1 - 2*p + epsilon
+PMatrix[0,1] = p - epsilon
+PMatrix[1,0] = p - epsilon
+PMatrix[1,1] = epsilon
+
+#Generate Pair of Binary strings coming from Pmatrix
+BSFR = np.zeros((10000))
+BSFC = np.zeros((10000))
+for k in range(0,10000):
+    sample = np.random.choice(4,p = PMatrix.flatten())
+    r = int(sample/2)
+    c = np.mod(sample,2)
+    BSFR[k] = r
+    BSFC[k] = c
+    
+#Hashing Samples
+#First take substring of HashLength and then convert to an integer using base 2 conversion
+
+StartPosition = 5
+BSFR_Substring = BSFR[5:(5+HashLength+1)][:-1]
+BSFC_Substring = BSFC[5:(5+HashLength+1)][:-1]
+BSFRNum = 0
+BSFCNum = 0
+for k in range(0,HashLength):
+    BSFRNum = BSFR_Substring[k] * np.power(2,k) + BSFRNum
+    BSFCNum = BSFC_Substring[k] * np.power(2,k) + BSFCNum
+    
+
+HashBSFRSubstring = np.where(A[BSFRNum,:] == 1)
+HashBSFCSubstring = np.where(B[BSFCNum,:] == 1)
